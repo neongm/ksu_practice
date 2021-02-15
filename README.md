@@ -1,2 +1,2 @@
 # ksu_practice
-repository for university-related code and learning git
+repository for university-related code and learning git/github
