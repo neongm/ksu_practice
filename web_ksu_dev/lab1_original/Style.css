@@ -1,0 +1,53 @@
+body {  /* Фоновое изрбражение */
+		margin: 20px;
+		padding: 0px;
+		/*Background-image: url(z.bmp);*/
+		background-image: url(images/bg.jpg); /* Путь к фоновому изображению */
+		background-color: #c7b39b; /* Цвет фона */
+		font-family: Times New Roman;
+		font-size: 20pt;}
+a { /* Гиперссылка */
+	color: #800000;}
+a:visited { /* Гиперссылка */ 
+			color: #800000;}
+a:hover { /* Гиперссылка */
+			color: #d86600;}
+h2 { /* Тип шрифта в ячейке таблицы */
+		font-size: 16px;
+		font-weight: normal;
+		margin-bottom: 0px;
+		color: #000080;
+		line-height: 140%;
+	}
+.d1 { /* Абсолютное положение таблицы на странице */
+		position: absolute;
+		top: 28%;
+		left: 1%;
+	}
+.text { /* Заголовок агружаемой страницы */
+		position: absolute;
+		top: 1%;
+		left: 20%;
+		font-size: 32pt;
+		color: #000080;
+		text-align: center;
+		letter-spacing: 12px;
+		filter: Glow(Strength='6', color='#8000000');
+		}
+.link { /* Стиль для шрифта текста, который является гиперссылкой */
+			position: absolute;
+			top: 94%;
+			left: 44%;
+			font-family: Times New Roman;
+			font-size: 14pt;
+		}
+.t1 { /* Стиль рамки для первой ячейки */
+			border-width: 10px;
+			border-color: #000080;
+			border-style: outset;
+	}
+.t2 { /* Стиль рамки для второй ячейки */
+			border-width: 12px;
+			border-color: #000080;
+			border-style: outset;
+	}
