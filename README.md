@@ -5,4 +5,4 @@ Repository for university-related code and learning git/github.
 Just reformatting of the teacher's example. It worked, free to use.
 
 ### TODO
-- lab2 - image maps
+- lab2 - image maps))))))))))))))))))))))))))))))))))))))))))))))))))))))))
