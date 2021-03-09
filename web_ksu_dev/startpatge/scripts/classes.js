@@ -6,7 +6,9 @@ class Panel
 
     constructor(props){
         this.#name = props.name;
-        this.#color = props.color;
+        
+        if(props.color != '') this.#color = props.color;
+        else this.#color = '#999999';
         this.#elements = props.elements;
     } 
 
@@ -19,14 +21,63 @@ class Panel
     get color(){ return this.#color; }
     get elements(){ return this.#elements; }
 
-    addElement(element){
-        this.#elements.push(element);
+    addElement(_element){
+        if( _element instanceof Element) this.#elements.push(_element);
     }
     changeColor(color){
         this.#color = color;
     }
     changeName(name){
         this.#name = name;
+    }
+
+    draw(parent_id){
+
+        let container = document.getElementById(parent_id);
+        // main panel div
+        let div = document.createElement("div");
+        div.className = "card black r5 p5";
+        div.id = this.#name;
+    
+        // colored line
+        let line = document.createElement("div");
+        line.setAttribute("style", `background-color: ${this.#color};`);
+        div.appendChild(line);
+    
+        // draw contained elements
+        this.draw_elements(this.#name);
+        container.appendChild(div);
+    }
+
+    draw_elements(panel_id){
+        let container = document.getElementById(panel_id);
+        
+        // if there is any elements
+        if (this.#elements != []){
+            for(let elem in this.#elements)
+            {   
+                // creating DOM for element
+                let link_cont = document.createElement("a");
+                let div_ch =  document.createElement("div");
+                link_cont.appendChild(div_ch)
+
+                // for links
+                if(elem.type == "link")
+                {
+                    div_ch.className = "link r5"; 
+                    div_ch.innerHTML = elem.text;
+                    link_cont.setAttribute("href", elem.link);
+                }   
+                // for descriprions/reminders TODO
+                else if (elem.type == "desc")
+                {
+                    div_ch.className = "desc r5"; 
+                }
+
+                // add result to container for each element
+                container.appendChild(link_cont);
+            } 
+        }
     }
 }
 

@@ -1,6 +1,4 @@
 
-var _lswrapper = new lswrapper();
-
 function show_keys()
 {
     console.log(_lswrapper.get_all_keys());
