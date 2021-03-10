@@ -13,7 +13,7 @@ class lswrapper
     #keys = [];
 
     constructor()
-    {   
+    {
         this.#keys = this.get_all_keys();
         // will add PANELS to storage if necessary
         if (!contains(this.#keys, PANELS_ARRAY))
@@ -21,7 +21,7 @@ class lswrapper
             this.set_arr(PANELS_ARRAY, []);
             this.#update_keys();
         }
-    }   
+    }
     
     #update_keys() { this.#keys = this.get_all_keys(); }
 
@@ -49,11 +49,13 @@ class lswrapper
 
     get_arr(key)
     {
-        let arr = JSON.parse(localStorage.getItem(key));
-        if(arr)
+        if(localStorage.getItem(key))
         {
-            console.log(`get_arr:`);
-            for (let i=0; i< arr.length; i++) console.log( arr[i]);
+            let arr = JSON.parse(localStorage.getItem(key));
+
+            console.log(`get_arr:`);  // LOG
+            for (let i=0; i<arr.length; i++) console.log( arr[i] );
+
             return arr;
         }
     }
@@ -78,13 +80,14 @@ class lswrapper
 
 
     // additional features for panel-management
-    get_panel(panel_name) {
+    get_panel(panel_name) 
+    {
         let all_panels = this.get_arr(PANELS_ARRAY);
         // searching through panels
         if (contains(all_panels, panel_name))
-            {
-                return this.get_arr(panel_name);
-            }
+        {
+            return this.get_arr(panel_name);
+        }
     }
 
     get_panels_names()
@@ -114,7 +117,7 @@ class lswrapper
         {
             target_panel.addElement(_element);
         }
-    }
+    } 
 }
 
 
