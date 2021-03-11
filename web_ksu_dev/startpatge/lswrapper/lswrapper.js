@@ -10,11 +10,39 @@ class lswrapper
         this.#_lslow = new lswrapper_lowlvl();
     }   
 
-    set_arr(array_name, objects)
+    create_arr(array_name, objects)
     {
-        this.#_lslow(array_name, objects);
+        this.#_lslow.create_array_of_objects(array_name, objects);
     }
 
+    remove(_array_name, _names)
+    {
+        if (Array.isArray(_names)) var names_arr = _names;
+        else names_arr = [_names]   
+        this.#_lslow.remove_from_array_of_objects(_array_name, names_arr);
+    }
+
+    push(_array_name, _objects)
+    {
+        if(!_objects || _objects == [] || _objects == '' || !Array.isArray(_objects)) return
+        this.#_lslow.push_to_array_of_objects(_array_name, _objects);
+    }
+
+    drop_ls()
+    {
+        this.#_lslow.drop_localStorage();
+    }
+
+    get_objects(_array_name)
+    {
+        if(_array_name == '' || _array_name == undefined) return
+        return this.#_lslow.get_array_of_objects();
+    }
+
+    get_object(_array_name, _object_name)
+    {
+        if (_object_name != '' || _object_name != undefined) return this.#_lslow.get_object_from_array();
+    }
 
     test()
     {
@@ -34,11 +62,18 @@ class lswrapper
             elements: "elements3",
         };
 
-        this.#_lslow.set_array_of_objects("low_panels", [pan, pan2, pan3]);
+        let input_arr = [pan, pan2, pan3];
+        let test_arr_name = "test";
+        this.#_lslow.create_array_of_objects(test_arr_name, input_arr);
+        let output_arr = this.#_lslow.get_array_of_objects(test_arr_name);
 
-        let arr = this.#_lslow.get_array_of_objects("low_panels");
+        console.log(`input arr:`);
+        console.log(input_arr);
+        console.log(`output arr:`);
+        console.log(output_arr);
+
+        
     }
-
 }
 
 
@@ -73,6 +108,14 @@ class lswrapper_lowlvl
         return objects
     }
 
+    get_object_from_array(_array_name, _object_name)
+    {
+        if (this.exists_in_array(_array_name, _object_name))
+        {
+            return JSON.parse(localStorage.getItem(_object_name));
+        }
+    }
+
     push_to_array_of_objects(_array_name, _objects)
     {
         if (this.exists_in_localStorage(_array_name))
@@ -96,11 +139,16 @@ class lswrapper_lowlvl
             if(this.exists_in_array(_array_name, _objects_names[i]))
             {
                 // DELETE FROM NAMES ARRAY
+                let obj_names = JSON.parse(localStorage.getItem(_array_name));
+                let deleted = obj_names.splice(obj_names.indexOf(_objects_names[i]), 1);
+                localStorage.setItem(_array_name, JSON.stringify(obj_names));
+                console.log(`deleted: ${deleted}`);
+                console.log(`remaining: ${obj_names}`);
 
                 // DELETE FORM LS
+                localStorage.removeItem(_objects_names[i]);
             }
         }
-
     }
 
     exists_in_localStorage(_key)
@@ -112,7 +160,7 @@ class lswrapper_lowlvl
     exists_in_array(_array_name, _key)
     {
         let target_keys_array = JSON.parse(localStorage.getItem(_array_name));
-        if (target_keys_array.indexOf(_ket) == -1) return false
+        if (target_keys_array.indexOf(_key) == -1) return false
         return true
 
     }
@@ -122,5 +170,10 @@ class lswrapper_lowlvl
         let temp_keys = [];
         for(let i=0; i<localStorage.length; i++) temp_keys.push(localStorage.key(i));
         return temp_keys;
+    }
+
+    drop_localStorage()
+    {
+        for(let key in this.#get_all_keys()) localStorage.removeItem(key);   
     }
 }
