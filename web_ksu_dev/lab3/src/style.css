@@ -1,0 +1,68 @@
+body{
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #B4C5E4;
+}
+
+
+table.mytable{
+    text-decoration: none;
+    border-collapse:collapse;
+    width:100%;
+    text-align:left;
+    height: 500px;
+}
+
+table.mytable th{
+    font-weight:normal;
+    font-size:26px;
+    color:#ffffff;
+    background-color:#49516F;
+}
+
+table.mytable td{
+    font-size:17px;
+    color:#49516F;
+    background-color: #FBFFF1;
+}
+
+table.mytable td, table.mytable th{
+    white-space:pre-wrap;
+    padding:13px 13px;
+    line-height:17px;
+    vertical-align: middle;
+    border: 2px solid #49516F;
+}
+
+table.mytable tr:hover{
+    background-color:#ebebeb
+}
+
+table.mytable tr:hover td{
+    color:#49516F;
+    cursor:default;
+    background: rgb(226, 226, 226);
+}
+
+
+p{
+    font-size: 14pt;
+    font-weight: 700;
+}
+
+h1{
+    background-color: #49516F;
+    padding: 10px 0 20px 350px;
+    color: #FFF;
+    font-weight: 100;
+    font-size: 40px;
+}
+a{
+    color: #49516F;
+    font-size: 20px;
+}
+a:visited{
+    color: #5c6ba1;
+}
+a:hover{
+    color: orange;
+}
