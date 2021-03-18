@@ -4,11 +4,17 @@ class lswrapper
     #panels = [];
     #elements = [];
     #_lslow;
+    #PANELS = "PANELS"
 
     constructor()
     {   
         this.#_lslow = new lswrapper_lowlvl();
-    }   
+
+        if(!this.#_lslow.exists_in_localStorage(this.#PANELS))
+        {
+            this.#_lslow.create_array_of_objects(this.#PANELS, []);
+        }
+    }
 
     create_arr(array_name, objects)
     {
@@ -18,7 +24,7 @@ class lswrapper
     remove(_array_name, _names)
     {
         if (Array.isArray(_names)) var names_arr = _names;
-        else names_arr = [_names]   
+        else names_arr = [_names];
         this.#_lslow.remove_from_array_of_objects(_array_name, names_arr);
     }
 
@@ -44,33 +50,92 @@ class lswrapper
         if (_object_name != '' || _object_name != undefined) return this.#_lslow.get_object_from_array();
     }
 
+
+    draw_panel(_panel_name)
+    {
+        if(!exists_in_localStorage(_panel_name)) return
+        let panel_from_arr = this.#_lslow.get_object_from_array(_panel_name)
+        
+        var panel = document.createElement("div");
+        panel.className = "card black p5 r5";
+        panel.id = panel_from_arr.name;
+
+        // colored line
+        var line = document.createElement("div");
+        line.setAttribute("style", `background-color: ${panel_from_arr.color};`);
+        line.className = "line r5";
+        panel.appendChild(line);
+
+        // get the elements list
+        var elements = this.#_lslow.get_array_of_objects(panel_from_arr.elements); 
+
+        var el_cont = document.createElement("div");
+        if( panel.elements != undefined ) el_cont = this.#draw_elements(el_cont, elements);
+        panel.appendChild(el_cont);
+
+        document.getElementById("main_container").appendChild(panel);
+
+        // panel obj should look like this:
+        //      {
+        //      name: "some unique name",
+        //      color: #somecolor,
+        //      elements: "name of array with elements of panel"    
+        //}
+
+        // element obj should look like this:
+        //     {
+        //     type: "type of element",
+        //     text: "text on element",
+        //     desc_link: "description or link depending on type"    
+        // }
+        
+    }
+
+    #draw_elements(div, elements){
+    for(i = 0; i < elements.length; i++){
+        var link_cont = document.createElement("a");
+        var div_ch =  document.createElement("div");
+        link_cont.appendChild(div_ch)
+        if ( elements[i].type == "link" ) { 
+            div_ch.className = "link r5"; 
+            div_ch.innerHTML = elements[i].text;
+            link_cont.setAttribute("href", elements[i].desc_link);
+        } 
+        else if (elements[i].type == "desc") {
+            div_ch.className = "desc r5"; 
+        } 
+        div.appendChild(link_cont);
+        div_ch.innerHTML = elements[i].text;
+    }
+    return div;
+}
+
     test()
     {
-        let pan = {
-            name: "name1",
-            color: "color2",
-            elements: "elements1",
+        let panel = {
+            name: "some_panel 1",
+            color: "#21ff21",
+            elements: "spelements",
         };
-        let pan2 = {
-            name: "name3",
-            color: "color4",
-            elements: "elements2",
+        let element = {
+            type: "link",
+            text: "mylink",
+            desc_link: "https://vk.com/im"
         };
-        let pan3 = {
-            name: "name5",
-            color: "color6",
-            elements: "elements3",
-        };
+        
+        
 
-        let input_arr = [pan, pan2, pan3];
-        let test_arr_name = "test";
-        this.#_lslow.create_array_of_objects(test_arr_name, input_arr);
-        let output_arr = this.#_lslow.get_array_of_objects(test_arr_name);
+        // добавление панели
+        this.#_lslow.push_to_array_of_objects(this.#PANELS, panel);
+        // добавление элмента
+        this.#_lslow.push_to_array_of_objects(panel.elements, element);
 
-        console.log(`input arr:`);
-        console.log(input_arr);
-        console.log(`output arr:`);
-        console.log(output_arr);
+
+        if(this.#_lslow.exists_in_array(this.#PANELS, panel.name))
+        {
+            this.draw_panel(panel.name);
+        }
+        
 
         
     }
