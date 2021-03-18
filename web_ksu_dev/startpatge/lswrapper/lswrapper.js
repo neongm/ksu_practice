@@ -1,4 +1,115 @@
 
+class lswrapper_lowlvl
+{
+    create_array_of_objects(_array_name, _objects)  
+    {
+        if(_array_name != '' || !this.exists_in_localStorage(_array_name))
+        { 
+            let obj_names = [];
+            for (let i=0; i<_objects.length; i++)
+            {
+                console.log(`pushing ${_objects[i]} with name = ${_objects[i].name}`);
+                localStorage.setItem(_objects[i].name, JSON.stringify(_objects[i]));
+                obj_names.push(_objects[i].name);
+            }
+            localStorage.setItem(_array_name, JSON.stringify(obj_names));
+        }
+    }
+
+    get_array_of_objects(_array_name) // Добавить поверки
+    {
+        let objects = [];
+        let obj_names = JSON.parse(localStorage.getItem(_array_name));
+        for (let i=0; i<obj_names.length; i++)
+        {
+            let object = JSON.parse(localStorage.getItem(obj_names[i]));
+            objects.push(object);
+            console.log(`returning objct with name ${object.name}`)
+            console.log(object);
+        }
+        return objects
+    }
+
+    get_object_from_array(_array_name, _object_name)
+    {
+        if (this.exists_in_array(_array_name, _object_name))
+        {
+            return JSON.parse(localStorage.getItem(_object_name));
+        }
+    }
+
+    push_to_array_of_objects(_array_name, _objects)
+    {
+        if (this.exists_in_localStorage(_array_name))
+        {
+            let array_of_names = this.get_array_of_objects(_array_name);
+            if (Array.isArray(_objects))
+            {
+                for(let i=0; i<_objects.length; i++)
+                {
+                    // push object's name to array of names
+                    array_of_names.push(_objects[i].name);
+                    // push the object
+                    localStorage.setItem(_objects[i].name, JSON.stringify(_objects[i]));
+                }
+                // save the array back to the storage
+                localStorage.setItem(_array_name, JSON.stringify(array_of_names));
+            }
+            else
+            {
+                array_of_names.push(_objects.name);
+                localStorage.setItem(_objects.name, JSON.stringify(_objects));
+                localStorage.setItem(_array_name, JSON.stringify(array_of_names));
+            }
+        }
+    }
+
+    remove_from_array_of_objects(_array_name, _objects_names)
+    {
+        for(let i=0; i<_objects_names.length; i++) {
+            if(this.exists_in_array(_array_name, _objects_names[i]))
+            {
+                // DELETE FROM NAMES ARRAY
+                let obj_names = JSON.parse(localStorage.getItem(_array_name));
+                let deleted = obj_names.splice(obj_names.indexOf(_objects_names[i]), 1);
+                localStorage.setItem(_array_name, JSON.stringify(obj_names));
+                console.log(`deleted: ${deleted}`);
+                console.log(`remaining: ${obj_names}`);
+
+                // DELETE FORM LS
+                localStorage.removeItem(_objects_names[i]);
+            }
+        }
+    }
+
+    exists_in_localStorage(_key)
+    {
+        if (this.#get_all_keys().indexOf(_key) == -1) return false
+        return true
+    }
+
+    exists_in_array(_array_name, _key)
+    {
+        let target_keys_array = JSON.parse(localStorage.getItem(_array_name));
+        if (target_keys_array.indexOf(_key) == -1) return false
+        return true
+
+    }
+
+    #get_all_keys()
+    {
+        let temp_keys = [];
+        for(let i=0; i<localStorage.length; i++) temp_keys.push(localStorage.key(i));
+        return temp_keys;
+    }
+
+    drop_localStorage()
+    {
+        for(let key in this.#get_all_keys()) localStorage.removeItem(key);   
+    }
+}
+
+
 class lswrapper
 {
     #panels = [];
@@ -113,7 +224,7 @@ class lswrapper
     test()
     {
         let panel = {
-            name: "some_panel 1",
+            name: "some_panel_1",
             color: "#21ff21",
             elements: "spelements",
         };
@@ -128,7 +239,8 @@ class lswrapper
         // добавление панели
         this.#_lslow.push_to_array_of_objects(this.#PANELS, panel);
         // добавление элмента
-        this.#_lslow.push_to_array_of_objects(panel.elements, element);
+        if(!this.#_lslow.exists_in_localStorage(panel.elements)) this.#_lslow.create_array_of_objects(panel.elements, []);
+        this.#_lslow.push_to_array_of_objects(panel.elements, [element]);
 
 
         if(this.#_lslow.exists_in_array(this.#PANELS, panel.name))
@@ -141,104 +253,3 @@ class lswrapper
     }
 }
 
-
-class lswrapper_lowlvl
-{
-    create_array_of_objects(_array_name, _objects)  
-    {
-        if(_array_name != '' || !this.exists_in_localStorage(_array_name))
-        { 
-            let obj_names = [];
-            for (let i=0; i<_objects.length; i++)
-            {
-                console.log(`pushing ${_objects[i]} with name = ${_objects[i].name}`);
-                localStorage.setItem(_objects[i].name, JSON.stringify(_objects[i]));
-                obj_names.push(_objects[i].name);
-            }
-            localStorage.setItem(_array_name, JSON.stringify(obj_names));
-        }
-    }
-
-    get_array_of_objects(_array_name) // Добавить поверки
-    {
-        let objects = [];
-        let obj_names = JSON.parse(localStorage.getItem(_array_name));
-        for (let i=0; i<obj_names.length; i++)
-        {
-            let object = JSON.parse(localStorage.getItem(obj_names[i]));
-            objects.push(object);
-            console.log(`returning objct with name ${object.name}`)
-            console.log(object);
-        }
-        return objects
-    }
-
-    get_object_from_array(_array_name, _object_name)
-    {
-        if (this.exists_in_array(_array_name, _object_name))
-        {
-            return JSON.parse(localStorage.getItem(_object_name));
-        }
-    }
-
-    push_to_array_of_objects(_array_name, _objects)
-    {
-        if (this.exists_in_localStorage(_array_name))
-        {
-            let array_of_names = this.get_array_of_objects(_array_name);
-            for(let i=0; i<_objects.length; i++)
-            {
-                // push object's name to array of names
-                array_of_names.push(_objects[i].name);
-                // push the object
-                localStorage.setItem(_objects[i].name, JSON.stringify(_objects[i]));
-            }
-            // save the array back to the storage
-            localStorage.setItem(_array_name, JSON.stringify(array_of_names));
-        }
-    }
-
-    remove_from_array_of_objects(_array_name, _objects_names)
-    {
-        for(let i=0; i<_objects_names.length; i++) {
-            if(this.exists_in_array(_array_name, _objects_names[i]))
-            {
-                // DELETE FROM NAMES ARRAY
-                let obj_names = JSON.parse(localStorage.getItem(_array_name));
-                let deleted = obj_names.splice(obj_names.indexOf(_objects_names[i]), 1);
-                localStorage.setItem(_array_name, JSON.stringify(obj_names));
-                console.log(`deleted: ${deleted}`);
-                console.log(`remaining: ${obj_names}`);
-
-                // DELETE FORM LS
-                localStorage.removeItem(_objects_names[i]);
-            }
-        }
-    }
-
-    exists_in_localStorage(_key)
-    {
-        if (this.#get_all_keys().indexOf(_key) == -1) return false
-        return true
-    }
-
-    exists_in_array(_array_name, _key)
-    {
-        let target_keys_array = JSON.parse(localStorage.getItem(_array_name));
-        if (target_keys_array.indexOf(_key) == -1) return false
-        return true
-
-    }
-
-    #get_all_keys()
-    {
-        let temp_keys = [];
-        for(let i=0; i<localStorage.length; i++) temp_keys.push(localStorage.key(i));
-        return temp_keys;
-    }
-
-    drop_localStorage()
-    {
-        for(let key in this.#get_all_keys()) localStorage.removeItem(key);   
-    }
-}
