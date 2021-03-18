@@ -1,4 +1,5 @@
 
+// переделать этот класс вообще, его можно сделать проще
 class lswrapper_lowlvl
 {
     create_array_of_objects(_array_name, _objects)  
@@ -8,7 +9,6 @@ class lswrapper_lowlvl
             let obj_names = [];
             for (let i=0; i<_objects.length; i++)
             {
-                console.log(`pushing ${_objects[i]} with name = ${_objects[i].name}`);
                 localStorage.setItem(_objects[i].name, JSON.stringify(_objects[i]));
                 obj_names.push(_objects[i].name);
             }
@@ -24,8 +24,6 @@ class lswrapper_lowlvl
         {
             let object = JSON.parse(localStorage.getItem(obj_names[i]));
             objects.push(object);
-            console.log(`returning objct with name ${object.name}`)
-            console.log(object);
         }
         return objects
     }
@@ -73,8 +71,6 @@ class lswrapper_lowlvl
                 let obj_names = JSON.parse(localStorage.getItem(_array_name));
                 let deleted = obj_names.splice(obj_names.indexOf(_objects_names[i]), 1);
                 localStorage.setItem(_array_name, JSON.stringify(obj_names));
-                console.log(`deleted: ${deleted}`);
-                console.log(`remaining: ${obj_names}`);
 
                 // DELETE FORM LS
                 localStorage.removeItem(_objects_names[i]);
@@ -91,8 +87,9 @@ class lswrapper_lowlvl
     exists_in_array(_array_name, _key)
     {
         let target_keys_array = JSON.parse(localStorage.getItem(_array_name));
-        if (target_keys_array.indexOf(_key) == -1) return false
-        return true
+        if (!Array.isArray(target_keys_array)) return false;
+        if (target_keys_array.indexOf(_key) == -1) return false;
+        return true;
 
     }
 
@@ -161,95 +158,122 @@ class lswrapper
         if (_object_name != '' || _object_name != undefined) return this.#_lslow.get_object_from_array();
     }
 
-
-    draw_panel(_panel_name)
+    add_panel(_name, _color) // ... добавить проверки
     {
-        if(!exists_in_localStorage(_panel_name)) return
-        let panel_from_arr = this.#_lslow.get_object_from_array(_panel_name)
-        
+        let panel = {
+            name: _name,
+            color: _color,
+            elements: _name+'_elems',
+        }
+        this.#_lslow.create_array_of_objects(_name+'_elems', []);
+        this.#_lslow.push_to_array_of_objects(this.#PANELS, panel);
+    }
+
+    create_element(_type, _text, _desc_link) // ... добавить проверки
+    {
+        let element = {
+            name: _text+`_kindaid`,
+            type: _type,
+            text: _text,
+            desc_link: _desc_link
+        }
+        return element
+    }
+
+    add_element_to_panel(_panel_name, _element) // ... добавить проверки
+    {
+        let elems = this.#_lslow.get_object_from_array(this.#PANELS, _panel_name).elements;
+        this.#_lslow.push_to_array_of_objects(elems, _element);
+    }
+
+    draw_all_panels()  // ... добавить проверки
+    {
+        let arr = this.#_lslow.get_array_of_objects(this.#PANELS);
+
+        for(let i=0; i<arr.length; i++)
+        {
+            let obj = arr[i];
+            let pan = new Panel(obj);
+            pan.draw();
+        }
+    }
+}
+
+class Panel 
+{
+    #_lslow;
+    name = '';
+    color = '';
+    elements = [];
+    #elements_arr_name = '';
+
+    update_elements()
+    {
+        this.elements = this.#_lslow.get_array_of_objects(this.#elements_arr_name);
+    }
+
+    constructor(props)
+    {
+        this.#_lslow = new lswrapper_lowlvl;
+        this.name = props.name;
+        this.color = props.color;
+        this.#elements_arr_name = props.elements;
+        this.elements = this.#_lslow.get_array_of_objects(this.#elements_arr_name);
+    }
+
+    draw()
+    {
+        console.log(`drawing: \n${this.name}\n${this.color}\n${this.#elements_arr_name}`);
+        this.elements = this.#_lslow.get_array_of_objects(this.#elements_arr_name);
+
         var panel = document.createElement("div");
         panel.className = "card black p5 r5";
-        panel.id = panel_from_arr.name;
+        panel.id = this.name;
 
         // colored line
         var line = document.createElement("div");
-        line.setAttribute("style", `background-color: ${panel_from_arr.color};`);
+        line.setAttribute("style", `background-color: ${this.color};`);
         line.className = "line r5";
         panel.appendChild(line);
 
-        // get the elements list
-        var elements = this.#_lslow.get_array_of_objects(panel_from_arr.elements); 
-
+        // add the elements
         var el_cont = document.createElement("div");
-        if( panel.elements != undefined ) el_cont = this.#draw_elements(el_cont, elements);
+        el_cont = this.#draw_elements(el_cont, this.elements);
         panel.appendChild(el_cont);
 
         document.getElementById("main_container").appendChild(panel);
-
-        // panel obj should look like this:
-        //      {
-        //      name: "some unique name",
-        //      color: #somecolor,
-        //      elements: "name of array with elements of panel"    
-        //}
-
-        // element obj should look like this:
-        //     {
-        //     type: "type of element",
-        //     text: "text on element",
-        //     desc_link: "description or link depending on type"    
-        // }
-        
     }
 
     #draw_elements(div, elements){
-    for(i = 0; i < elements.length; i++){
-        var link_cont = document.createElement("a");
-        var div_ch =  document.createElement("div");
-        link_cont.appendChild(div_ch)
-        if ( elements[i].type == "link" ) { 
-            div_ch.className = "link r5"; 
-            div_ch.innerHTML = elements[i].text;
-            link_cont.setAttribute("href", elements[i].desc_link);
-        } 
-        else if (elements[i].type == "desc") {
-            div_ch.className = "desc r5"; 
-        } 
-        div.appendChild(link_cont);
-        div_ch.innerHTML = elements[i].text;
-    }
-    return div;
-}
-
-    test()
-    {
-        let panel = {
-            name: "some_panel_1",
-            color: "#21ff21",
-            elements: "spelements",
-        };
-        let element = {
-            type: "link",
-            text: "mylink",
-            desc_link: "https://vk.com/im"
-        };
-        
-        
-
-        // добавление панели
-        this.#_lslow.push_to_array_of_objects(this.#PANELS, panel);
-        // добавление элмента
-        if(!this.#_lslow.exists_in_localStorage(panel.elements)) this.#_lslow.create_array_of_objects(panel.elements, []);
-        this.#_lslow.push_to_array_of_objects(panel.elements, [element]);
-
-
-        if(this.#_lslow.exists_in_array(this.#PANELS, panel.name))
+        for(var i = 0; i < elements.length; i++) // ... добаивть проверку
         {
-            this.draw_panel(panel.name);
-        }
-        
+            var div_ch =  document.createElement("div");
 
-        
-    }
+            if ( elements[i].type == "link" ) 
+            { 
+                div_ch.className = "link r5"; 
+                var a =  document.createElement("a");
+                a.innerHTML = elements[i].text;
+                a.setAttribute("href", elements[i].desc_link);
+                div_ch.appendChild(a);
+            } 
+            else if (elements[i].type == "desc") 
+            {
+                div_ch.className = "desc r5";
+                div_ch.innerHTML = elements[i].text;
+            } 
+
+            div.appendChild(div_ch);
+        }
+        return div;
+    }   
 }
 
+
+// element obj should look like this:
+//     {
+//     name:  "some id-like name (unique) "
+//     type: "type of element",
+//     text: "text on element",
+//     desc_link: "description or link depending on type"    
+// }
